@@ -1,0 +1,11 @@
+(() => {
+const $=id=>document.getElementById(id);
+const ta=$('toolText');
+if(ta){const update=()=>{const t=ta.value.trim(), words=t?t.split(/\s+/).length:0, sentences=t?(t.match(/[.!?]+(?=\s|$)/g)||[]).length:0; if($('words'))$('words').textContent=words.toLocaleString();if($('chars'))$('chars').textContent=ta.value.length.toLocaleString();if($('sentences'))$('sentences').textContent=sentences.toLocaleString();if($('readingTime'))$('readingTime').textContent=`Estimated reading time: ${words?Math.max(1,Math.ceil(words/200)):0} min`;};ta.addEventListener('input',update);update();
+document.querySelectorAll('[data-case]').forEach(b=>b.addEventListener('click',()=>{const v=ta.value,type=b.dataset.case;if(type==='upper')ta.value=v.toUpperCase();if(type==='lower')ta.value=v.toLowerCase();if(type==='title')ta.value=v.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());if(type==='sentence')ta.value=v.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g,c=>c.toUpperCase());update();}));
+const copy=$('copyText');if(copy)copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(ta.value);$('toolMessage').textContent='Copied.'}catch(e){$('toolMessage').textContent='Clipboard permission was unavailable. Select and copy the text manually.'}});
+}
+const conv=$('convertUnit');if(conv)conv.addEventListener('click',()=>{const v=Number($('unitValue').value),type=$('unitType').value;if($('unitValue').value===''||!Number.isFinite(v)){$('unitResult').textContent='Enter a valid number.';return}const m={'km-mi':[v*.621371,'miles'],'mi-km':[v/0.621371,'kilometres'],'kg-lb':[v*2.2046226218,'pounds'],'lb-kg':[v/2.2046226218,'kilograms'],'cm-in':[v/2.54,'inches'],'in-cm':[v*2.54,'centimetres'],'c-f':[v*9/5+32,'°F'],'f-c':[(v-32)*5/9,'°C']};$('unitResult').textContent=`${v} converts to ${m[type][0].toLocaleString('en-IN',{maximumFractionDigits:6})} ${m[type][1]}`;});
+const dd=$('dateDiff');if(dd)dd.addEventListener('click',()=>{const a=$('dateA').value,b=$('dateB').value;if(!a||!b){$('dateOutput').textContent='Choose both dates.';return}const n=Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/86400000);$('dateOutput').textContent=`${Math.abs(n)} elapsed days${n<0?' (end date is before start date)':''}.`});
+const today=new Date().toISOString().slice(0,10);if($('dateA'))$('dateA').value=today;if($('dateB'))$('dateB').value=today;
+})();
